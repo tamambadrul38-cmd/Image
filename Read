@@ -1,0 +1,38 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/README.md b/README.md
+index 981ce214f5759acda40fd9441b57a97347789497..c12b7ec663fd6d35de394b7207c6f5fa5952aee3 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,27 @@
+-# Image
+\ No newline at end of file
++# Web Kenangan Foto (Siap Pakai)
++
++Aplikasi ini adalah web **tanpa backend** (HTML + CSS + JavaScript) untuk menyimpan foto kenangan langsung di browser menggunakan **IndexedDB**.
++
++## Fitur
++- Upload banyak foto sekaligus.
++- Simpan data foto ke penyimpanan browser (persisten).
++- Download foto.
++- Edit foto:
++  - Ubah judul.
++  - Rotate 90°/180°/270°.
++- Delete foto.
++- Move foto ke album lain.
++- Zooming foto (tombol dan scroll mouse).
++- Tidak ada minimal kapasitas foto yang dipaksa aplikasi (kapasitas mengikuti storage browser/perangkat).
++
++## Cara Pakai
++1. Buka file `index.html` langsung di browser.
++2. Atau jalankan server statis sederhana:
++   ```bash
++   python -m http.server 8080
++   ```
++   lalu akses `http://localhost:8080`.
++
++## Catatan
++- Karena ini berjalan di browser, kapasitas maksimum tetap tergantung kuota penyimpanan browser/device.
++- Untuk kapasitas sangat besar dan multi-user, sebaiknya gunakan backend + object storage.
+ 
+EOF
+)
