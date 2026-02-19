@@ -1,0 +1,411 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..16850ccbd6ed24586d379d5c92a7117567050427
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,401 @@
++<!DOCTYPE html>
++<html lang="id">
++<head>
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <title>Kenangan Foto</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
++  <style>
++    :root {
++      --bg: #060816;
++      --bg-soft: #11152e;
++      --card: rgba(255,255,255,.08);
++      --text: #eef2ff;
++      --muted: #bfc7ef;
++      --primary: #7c8cff;
++      --primary-2: #5eead4;
++      --danger: #fb7185;
++      --border: rgba(255,255,255,.14);
++      --shadow: 0 20px 50px rgba(0,0,0,.35);
++      --radius: 18px;
++    }
++
++    * { box-sizing: border-box; }
++    body {
++      margin: 0;
++      font-family: 'Plus Jakarta Sans', sans-serif;
++      color: var(--text);
++      background:
++        radial-gradient(circle at 12% 10%, #272f69 0%, transparent 38%),
++        radial-gradient(circle at 88% 20%, #0f766e 0%, transparent 28%),
++        radial-gradient(circle at 40% 85%, #581c87 0%, transparent 35%),
++        var(--bg);
++      min-height: 100vh;
++    }
++
++    .container { width: min(1180px, 92vw); margin: 0 auto; }
++
++    header {
++      padding: 36px 0 22px;
++      position: sticky;
++      top: 0;
++      backdrop-filter: blur(10px);
++      background: linear-gradient(to bottom, rgba(6,8,22,.85), rgba(6,8,22,.35));
++      z-index: 20;
++    }
++
++    .hero {
++      border: 1px solid var(--border);
++      background: linear-gradient(130deg, rgba(124,140,255,.22), rgba(94,234,212,.12));
++      border-radius: 24px;
++      padding: 26px;
++      box-shadow: var(--shadow);
++    }
++
++    h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; }
++    .tagline { margin: 8px 0 0; color: var(--muted); }
++
++    .stats {
++      margin-top: 14px;
++      display: flex;
++      flex-wrap: wrap;
++      gap: 10px;
++    }
++    .pill {
++      border: 1px solid var(--border);
++      background: rgba(255,255,255,.08);
++      border-radius: 999px;
++      padding: 8px 12px;
++      font-size: .9rem;
++      color: var(--muted);
++    }
++
++    main { padding: 16px 0 34px; }
++    .card {
++      border: 1px solid var(--border);
++      background: var(--card);
++      border-radius: var(--radius);
++      box-shadow: var(--shadow);
++      backdrop-filter: blur(9px);
++      padding: 16px;
++      margin-bottom: 14px;
++    }
++
++    .upload-grid { display: grid; grid-template-columns: 1.1fr 1fr auto; gap: 10px; align-items: end; }
++    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
++
++    label { font-size: .86rem; color: var(--muted); }
++    input, select, button {
++      width: 100%; margin-top: 6px; border-radius: 12px; border: 1px solid var(--border);
++      background: rgba(255,255,255,.09); color: var(--text); padding: 10px 12px;
++      font-family: inherit;
++    }
++
++    button { cursor: pointer; font-weight: 700; letter-spacing: .2px; }
++    button.primary { background: linear-gradient(90deg, var(--primary), #9f67ff); border: none; }
++    button.secondary { background: linear-gradient(90deg, #334155, #1f2937); border: none; }
++    button.danger { background: linear-gradient(90deg, #e11d48, #fb7185); border: none; }
++
++    .photo-card { overflow: hidden; }
++    .thumb-wrap { border-radius: 14px; overflow: hidden; position: relative; }
++    .thumb-wrap img {
++      width: 100%; height: 200px; object-fit: cover; display: block; cursor: zoom-in;
++      transition: transform .3s ease;
++    }
++    .thumb-wrap:hover img { transform: scale(1.06); }
++    .photo-info { margin: 10px 0; }
++    .photo-title { margin: 0; font-size: 1.04rem; }
++    .meta { margin-top: 5px; color: var(--muted); font-size: .86rem; }
++    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
++
++    #statusText { color: #bef264; font-size: .9rem; display: block; margin-top: 10px; }
++
++    .empty {
++      text-align: center; color: var(--muted); padding: 30px 12px; border: 1px dashed var(--border);
++      border-radius: 14px;
++    }
++
++    .modal { display:none; position:fixed; inset:0; background:rgba(2,6,23,.9); z-index:100; align-items:center; justify-content:center; }
++    .modal-wrap { max-width:92vw; max-height:92vh; position:relative; }
++    .modal img { max-width:100%; max-height:90vh; border-radius: 12px; border: 1px solid var(--border); transform-origin:center; }
++    .modal-tools { position:absolute; top:10px; right:10px; display:flex; gap:8px; }
++    .modal-tools button { width:auto; background: rgba(15,23,42,.8); }
++
++    @media (max-width: 820px) {
++      .upload-grid { grid-template-columns: 1fr; }
++    }
++  </style>
++</head>
++<body>
++  <header>
++    <div class="container hero">
++      <h1>🌌 Kenangan Foto Aesthetic</h1>
++      <p class="tagline">Simpan momen spesialmu: upload, edit, delete, move, zoom, dan download dalam satu tempat.</p>
++      <div class="stats">
++        <span class="pill" id="statCount">Total foto: 0</span>
++        <span class="pill">Penyimpanan: IndexedDB (browser)</span>
++        <span class="pill">Mode: Ready to use</span>
++      </div>
++    </div>
++  </header>
++
++  <main class="container">
++    <section class="card">
++      <h2>Upload Foto</h2>
++      <div class="upload-grid">
++        <div>
++          <label for="albumInput">Nama Album</label>
++          <input id="albumInput" type="text" placeholder="Contoh: Liburan Bali" value="Umum" />
++        </div>
++        <div>
++          <label for="fileInput">Pilih foto (multi-upload)</label>
++          <input id="fileInput" type="file" accept="image/*" multiple />
++        </div>
++        <div>
++          <button class="primary" onclick="uploadFiles()">Upload 🚀</button>
++        </div>
++      </div>
++      <small id="statusText"></small>
++    </section>
++
++    <section class="card">
++      <h2>Galeri Kenangan</h2>
++      <div id="gallery" class="gallery"></div>
++    </section>
++  </main>
++
++  <div id="zoomModal" class="modal" onclick="closeModal(event)">
++    <div class="modal-wrap">
++      <div class="modal-tools">
++        <button onclick="zoomIn(event)">＋</button>
++        <button onclick="zoomOut(event)">－</button>
++        <button onclick="zoomReset(event)">Reset</button>
++        <button onclick="hideModal(event)">Tutup</button>
++      </div>
++      <img id="zoomImg" src="" alt="zoom" />
++    </div>
++  </div>
++
++  <script>
++    const DB_NAME = 'kenangan_foto_db';
++    const STORE = 'photos';
++    let db;
++    let scale = 1;
++
++    function openDB() {
++      return new Promise((resolve, reject) => {
++        const req = indexedDB.open(DB_NAME, 1);
++        req.onupgradeneeded = () => {
++          const d = req.result;
++          if (!d.objectStoreNames.contains(STORE)) {
++            const st = d.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
++            st.createIndex('album', 'album', { unique: false });
++          }
++        };
++        req.onsuccess = () => resolve(req.result);
++        req.onerror = () => reject(req.error);
++      });
++    }
++
++    function tx(mode = 'readonly') { return db.transaction(STORE, mode).objectStore(STORE); }
++    function setStatus(text) { document.getElementById('statusText').textContent = text; }
++    function setCount(total) { document.getElementById('statCount').textContent = `Total foto: ${total}`; }
++
++    function readAsDataURL(file) {
++      return new Promise((resolve, reject) => {
++        const fr = new FileReader();
++        fr.onload = () => resolve(fr.result);
++        fr.onerror = () => reject(fr.error);
++        fr.readAsDataURL(file);
++      });
++    }
++
++    async function uploadFiles() {
++      const files = document.getElementById('fileInput').files;
++      const album = document.getElementById('albumInput').value.trim() || 'Umum';
++      if (!files.length) return setStatus('Pilih minimal 1 foto.');
++
++      let saved = 0;
++      for (const file of files) {
++        if (!file.type.startsWith('image/')) continue;
++        const dataUrl = await readAsDataURL(file);
++        await new Promise((resolve, reject) => {
++          const req = tx('readwrite').add({
++            title: file.name.replace(/\.[^.]+$/, ''),
++            filename: file.name,
++            album,
++            dataUrl,
++            createdAt: new Date().toISOString()
++          });
++          req.onsuccess = () => { saved++; resolve(); };
++          req.onerror = () => reject(req.error);
++        });
++      }
++      document.getElementById('fileInput').value = '';
++      setStatus(`Upload selesai ✨ ${saved} foto disimpan ke album ${album}.`);
++      renderGallery();
++    }
++
++    async function allPhotos() {
++      return new Promise((resolve, reject) => {
++        const req = tx().getAll();
++        req.onsuccess = () => resolve((req.result || []).sort((a,b) => b.id - a.id));
++        req.onerror = () => reject(req.error);
++      });
++    }
++
++    async function renderGallery() {
++      const gallery = document.getElementById('gallery');
++      const photos = await allPhotos();
++      setCount(photos.length);
++
++      if (!photos.length) {
++        gallery.innerHTML = '<div class="empty">Belum ada foto. Yuk upload momen pertama kamu 📸</div>';
++        return;
++      }
++
++      gallery.innerHTML = photos.map(p => `
++        <article class="card photo-card">
++          <div class="thumb-wrap">
++            <img src="${p.dataUrl}" alt="${escapeHtml(p.title)}" onclick="openModal('${p.dataUrl}')" />
++          </div>
++
++          <div class="photo-info">
++            <h3 class="photo-title">${escapeHtml(p.title)}</h3>
++            <div class="meta">Album: <b>${escapeHtml(p.album || 'Umum')}</b></div>
++            <div class="meta">File: ${escapeHtml(p.filename || 'foto')}</div>
++          </div>
++
++          <div class="row2">
++            <button class="secondary" onclick="downloadPhoto(${p.id})">Download</button>
++            <button class="danger" onclick="deletePhoto(${p.id})">Delete</button>
++          </div>
++
++          <input id="title-${p.id}" type="text" value="${escapeAttr(p.title)}" placeholder="Edit judul" />
++          <input id="album-${p.id}" type="text" value="${escapeAttr(p.album || 'Umum')}" placeholder="Edit album" />
++          <select id="rotate-${p.id}">
++            <option value="0">Rotate: tidak</option>
++            <option value="90">Rotate: 90°</option>
++            <option value="180">Rotate: 180°</option>
++            <option value="270">Rotate: 270°</option>
++          </select>
++          <button class="primary" onclick="editPhoto(${p.id})">Edit & Simpan</button>
++
++          <input id="move-${p.id}" type="text" placeholder="Album tujuan move" />
++          <button class="secondary" onclick="movePhoto(${p.id})">Move Album</button>
++        </article>
++      `).join('');
++    }
++
++    function escapeHtml(s='') { return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
++    function escapeAttr(s='') { return escapeHtml(s); }
++
++    async function getPhoto(id) {
++      return new Promise((resolve, reject) => {
++        const req = tx().get(id);
++        req.onsuccess = () => resolve(req.result);
++        req.onerror = () => reject(req.error);
++      });
++    }
++
++    async function putPhoto(photo) {
++      return new Promise((resolve, reject) => {
++        const req = tx('readwrite').put(photo);
++        req.onsuccess = () => resolve();
++        req.onerror = () => reject(req.error);
++      });
++    }
++
++    async function editPhoto(id) {
++      const p = await getPhoto(id);
++      if (!p) return;
++      p.title = document.getElementById(`title-${id}`).value.trim() || p.title;
++      p.album = document.getElementById(`album-${id}`).value.trim() || 'Umum';
++      const deg = parseInt(document.getElementById(`rotate-${id}`).value, 10);
++
++      if ([90,180,270].includes(deg)) p.dataUrl = await rotateDataUrl(p.dataUrl, deg);
++
++      await putPhoto(p);
++      setStatus('Foto berhasil diedit ✅');
++      renderGallery();
++    }
++
++    function rotateDataUrl(dataUrl, deg) {
++      return new Promise((resolve, reject) => {
++        const img = new Image();
++        img.onload = () => {
++          const c = document.createElement('canvas');
++          const ctx = c.getContext('2d');
++          const rad = deg * Math.PI / 180;
++          if (deg === 90 || deg === 270) { c.width = img.height; c.height = img.width; }
++          else { c.width = img.width; c.height = img.height; }
++          ctx.translate(c.width / 2, c.height / 2);
++          ctx.rotate(rad);
++          ctx.drawImage(img, -img.width / 2, -img.height / 2);
++          resolve(c.toDataURL('image/png'));
++        };
++        img.onerror = reject;
++        img.src = dataUrl;
++      });
++    }
++
++    async function movePhoto(id) {
++      const target = document.getElementById(`move-${id}`).value.trim();
++      if (!target) return setStatus('Isi album tujuan move.');
++      const p = await getPhoto(id);
++      if (!p) return;
++      p.album = target;
++      await putPhoto(p);
++      setStatus(`Foto dipindah ke album ${target}.`);
++      renderGallery();
++    }
++
++    async function deletePhoto(id) {
++      if (!confirm('Hapus foto ini?')) return;
++      await new Promise((resolve, reject) => {
++        const req = tx('readwrite').delete(id);
++        req.onsuccess = () => resolve();
++        req.onerror = () => reject(req.error);
++      });
++      setStatus('Foto dihapus.');
++      renderGallery();
++    }
++
++    async function downloadPhoto(id) {
++      const p = await getPhoto(id);
++      if (!p) return;
++      const a = document.createElement('a');
++      a.href = p.dataUrl;
++      a.download = p.filename || `${p.title || 'foto'}.png`;
++      a.click();
++    }
++
++    function openModal(src) {
++      document.getElementById('zoomModal').style.display = 'flex';
++      const z = document.getElementById('zoomImg');
++      z.src = src;
++      scale = 1;
++      z.style.transform = `scale(${scale})`;
++    }
++    function hideModal(e){ e.stopPropagation(); document.getElementById('zoomModal').style.display='none'; }
++    function closeModal(e){ if(e.target.id==='zoomModal') e.target.style.display='none'; }
++    function zoomIn(e){ e.stopPropagation(); scale=Math.min(scale+0.2,5); document.getElementById('zoomImg').style.transform=`scale(${scale})`; }
++    function zoomOut(e){ e.stopPropagation(); scale=Math.max(scale-0.2,0.4); document.getElementById('zoomImg').style.transform=`scale(${scale})`; }
++    function zoomReset(e){ e.stopPropagation(); scale=1; document.getElementById('zoomImg').style.transform=`scale(${scale})`; }
++
++    document.getElementById('zoomModal').addEventListener('wheel', (e) => {
++      e.preventDefault();
++      if (e.deltaY < 0) scale = Math.min(scale + 0.1, 5);
++      else scale = Math.max(scale - 0.1, 0.4);
++      document.getElementById('zoomImg').style.transform = `scale(${scale})`;
++    }, { passive: false });
++
++    (async function init() {
++      db = await openDB();
++      renderGallery();
++    })();
++  </script>
++</body>
++</html>
+ 
+EOF
+)
